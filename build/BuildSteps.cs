@@ -314,28 +314,43 @@ namespace Build
             string toSignDirPath = Path.Combine(Settings.OutputDir, Settings.SignInfo.ToSignDir);
             string authentiCodeDirectory = Path.Combine(toSignDirPath, Settings.SignInfo.ToAuthenticodeSign);
             string thirdPartyDirectory = Path.Combine(toSignDirPath, Settings.SignInfo.ToThirdPartySign);
+            string macDirectory = Path.Combine(toSignDirPath, Settings.SignInfo.ToMacSign);
 
             Directory.CreateDirectory(authentiCodeDirectory);
             Directory.CreateDirectory(thirdPartyDirectory);
+            Directory.CreateDirectory(macDirectory);
 
             foreach (var supportedRuntime in Settings.SignInfo.RuntimesToSign)
             {
                 var sourceDir = Path.Combine(Settings.OutputDir, supportedRuntime);
-                var toSignPaths = Settings.SignInfo.authentiCodeBinaries.Select(el => Path.Combine(sourceDir, el));
-                // Grab all the files and filter the extensions not to be signed
-                var toAuthenticodeSignFiles = FileHelpers.GetAllFilesFromFilesAndDirs(FileHelpers.ExpandFileWildCardEntries(toSignPaths))
-                                  .Where(file => !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
-
                 string dirName = $"Azure.Functions.Cli.{supportedRuntime}.{CurrentVersion}";
                 string targetDirectory = Path.Combine(authentiCodeDirectory, dirName);
-                toAuthenticodeSignFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetDirectory, sourceDir));
 
-                var toSignThirdPartyPaths = Settings.SignInfo.thirdPartyBinaries.Select(el => Path.Combine(sourceDir, el));
-                // Grab all the files and filter the extensions not to be signed
-                var toSignThirdPartyFiles = FileHelpers.GetAllFilesFromFilesAndDirs(FileHelpers.ExpandFileWildCardEntries(toSignThirdPartyPaths))
-                                            .Where(file => !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
-                string targetThirdPartyDirectory = Path.Combine(thirdPartyDirectory, dirName);
-                toSignThirdPartyFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetThirdPartyDirectory, sourceDir));
+                if (supportedRuntime.StartsWith("osx"))
+                {
+                    var toSignMacPaths = Settings.SignInfo.macBinaries.Select(el => Path.Combine(sourceDir, el));
+                    // Grab all the files and filter the extensions not to be signed
+                    var toSignMacFiles = FileHelpers.GetAllFilesFromFilesAndDirs(FileHelpers.ExpandFileWildCardEntries(toSignMacPaths))
+                                    .Where(file => !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
+
+                    toSignMacFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetDirectory, sourceDir));
+                }
+                else
+                {
+                    var toSignPaths = Settings.SignInfo.authentiCodeBinaries.Select(el => Path.Combine(sourceDir, el));
+                    // Grab all the files and filter the extensions not to be signed
+                    var toAuthenticodeSignFiles = FileHelpers.GetAllFilesFromFilesAndDirs(FileHelpers.ExpandFileWildCardEntries(toSignPaths))
+                                    .Where(file => !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
+
+                    toAuthenticodeSignFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetDirectory, sourceDir));
+
+                    var toSignThirdPartyPaths = Settings.SignInfo.thirdPartyBinaries.Select(el => Path.Combine(sourceDir, el));
+                    // Grab all the files and filter the extensions not to be signed
+                    var toSignThirdPartyFiles = FileHelpers.GetAllFilesFromFilesAndDirs(FileHelpers.ExpandFileWildCardEntries(toSignThirdPartyPaths))
+                                                .Where(file => !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
+                    string targetThirdPartyDirectory = Path.Combine(thirdPartyDirectory, dirName);
+                    toSignThirdPartyFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetThirdPartyDirectory, sourceDir));
+                }
             }
 
             // binaries we know are unsigned via sigcheck.exe
@@ -359,6 +374,12 @@ namespace Build
         {
             foreach (var supportedRuntime in Settings.SignInfo.RuntimesToSign)
             {
+                if (supportedRuntime.StartsWith("osx"))
+                {
+                    // skip mac for now
+                    continue;
+                }
+
                 var sourceDir = Path.Combine(Settings.OutputDir, supportedRuntime);
                 var targetDir = Path.Combine(Settings.OutputDir, Settings.PreSignTestDir, supportedRuntime);
                 Directory.CreateDirectory(targetDir);

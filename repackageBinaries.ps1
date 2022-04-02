@@ -49,7 +49,7 @@ try
     }
 
     # Runtimes with signed binaries
-    $runtimesIdentifiers = @("min.win-x86","min.win-x64")
+    $runtimesIdentifiers = @("min.win-x86","min.win-x64", "osx-arm64", "osx-x64")
     $tempDirectory = New-Item $tempDirectoryPath -ItemType Directory
     LogSuccess "$tempDirectoryPath created"
 
@@ -94,6 +94,16 @@ try
     $thirdPathDirectories  = Get-ChildItem $thirdPathDirectory -Directory
 
     foreach($directory in $thirdPathDirectories)
+    {
+        $sourcePath = $directory.FullName
+        Copy-Item -Path $sourcePath -Destination $tempDirectoryPath -Recurse -Force
+    }
+
+    # copy mac signed directory into extracted directories
+    $macDirectory  = "..\artifacts\ToSign\Mac\"
+    $macDirectories  = Get-ChildItem $macDirectory -Directory
+
+    foreach($directory in $macDirectories)
     {
         $sourcePath = $directory.FullName
         Copy-Item -Path $sourcePath -Destination $tempDirectoryPath -Recurse -Force

@@ -274,6 +274,7 @@ jobs:
       targetPath: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'drop'
       artifactType: 'pipeline'
+    condition: succeededOrFailed()
   - pwsh: |
       .\uploadContentToStorageAccount.ps1 -StorageAccountName $env:IntegrationTestsStorageAccountName -StorageAccountKey $env:IntegrationTestsStorageAccountKey -SourcePath '$(Build.ArtifactStagingDirectory)'
     env:

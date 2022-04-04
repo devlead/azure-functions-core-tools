@@ -171,7 +171,8 @@ jobs:
     inputs:
       ConnectedServiceName: 'ESRP Service'
       FolderPath: '$(Build.Repository.LocalPath)\artifacts\ToSign\Mac\'
-      Pattern: 'func,gozip'
+      Pattern: '**'
+      UseMinimatch: true
       signConfigType: 'inlineSignParams'
       inlineOperation: |
         [

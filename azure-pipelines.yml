@@ -172,7 +172,6 @@ jobs:
       ConnectedServiceName: 'ESRP Service'
       FolderPath: '$(Build.Repository.LocalPath)\artifacts\ToSign\Mac\'
       Pattern: '**'
-      UseMinimatch: true
       signConfigType: 'inlineSignParams'
       inlineOperation: |
         [

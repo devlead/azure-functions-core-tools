@@ -100,6 +100,7 @@ namespace Build
             string directoryPath = Path.GetDirectoryName(fullFilePath);
             Directory.CreateDirectory(directoryPath);
             File.Copy(sourceFilePath, fullFilePath);
+            ColoredConsole.WriteLine($"Copied {sourceFilePath} to {fullFilePath}");
         }
 
         public static void CreateZipFile(IEnumerable<string> files, string baseDir, string zipFilePath)

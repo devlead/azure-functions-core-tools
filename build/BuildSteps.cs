@@ -331,7 +331,7 @@ namespace Build
                     var toSignMacPaths = Settings.SignInfo.macBinaries.Select(el => Path.Combine(sourceDir, el));
                     // Grab all the files and filter the extensions not to be signed
                     var toSignMacFiles = FileHelpers.GetAllFilesFromFilesAndDirs(FileHelpers.ExpandFileWildCardEntries(toSignMacPaths))
-                                    .Where(file => !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
+                                    .Where(file => !Path.GetFileName(file).Contains(".") || !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
 
                     toSignMacFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetDirectory, sourceDir));
                 }

@@ -157,8 +157,8 @@ namespace Build
             };
 
             public static readonly string[] macBinaries = new[] {
-                "func.exe",
-                "gozip.exe"
+                "func",
+                "gozip"
             };
 
             public static readonly string[] authentiCodeBinaries = new[] {

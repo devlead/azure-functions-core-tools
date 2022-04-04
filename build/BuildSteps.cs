@@ -412,6 +412,12 @@ namespace Build
 
             foreach (string zipFilePath in zipFiles)
             {
+                if (zipFilePath.Contains("osx"))
+                {
+                    // skip mac for now
+                    continue;
+                }
+
                 bool isSignedRuntime = Settings.SignInfo.RuntimesToSign.Any(r => zipFilePath.Contains(r));
                 if (isSignedRuntime)
                 {

@@ -324,7 +324,6 @@ namespace Build
             {
                 var sourceDir = Path.Combine(Settings.OutputDir, supportedRuntime);
                 string dirName = $"Azure.Functions.Cli.{supportedRuntime}.{CurrentVersion}";
-                string targetDirectory = Path.Combine(authentiCodeDirectory, dirName);
 
                 if (supportedRuntime.StartsWith("osx"))
                 {
@@ -332,8 +331,8 @@ namespace Build
                     // Grab all the files and filter the extensions not to be signed
                     var toSignMacFiles = FileHelpers.GetAllFilesFromFilesAndDirs(FileHelpers.ExpandFileWildCardEntries(toSignMacPaths))
                                     .Where(file => !Path.GetFileName(file).Contains(".") || !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
-
-                    toSignMacFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetDirectory, sourceDir));
+                    string targetMacDirectory = Path.Combine(macDirectory, dirName);
+                    toSignMacFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetMacDirectory, sourceDir));
                 }
                 else
                 {
@@ -341,8 +340,8 @@ namespace Build
                     // Grab all the files and filter the extensions not to be signed
                     var toAuthenticodeSignFiles = FileHelpers.GetAllFilesFromFilesAndDirs(FileHelpers.ExpandFileWildCardEntries(toSignPaths))
                                     .Where(file => !Settings.SignInfo.FilterExtenstionsSign.Any(ext => file.EndsWith(ext))).ToList();
-
-                    toAuthenticodeSignFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetDirectory, sourceDir));
+                    string targetAuthenticodeDirectory = Path.Combine(authentiCodeDirectory, dirName);
+                    toAuthenticodeSignFiles.ForEach(f => FileHelpers.CopyFileRelativeToBase(f, targetAuthenticodeDirectory, sourceDir));
 
                     var toSignThirdPartyPaths = Settings.SignInfo.thirdPartyBinaries.Select(el => Path.Combine(sourceDir, el));
                     // Grab all the files and filter the extensions not to be signed
